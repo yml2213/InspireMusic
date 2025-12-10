@@ -29,7 +29,7 @@ export const CoverImage = React.forwardRef<HTMLImageElement, CoverImageProps>(
     const [hasError, setHasError] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const [showFallback, setShowFallback] = useState(false);
-    const fallbackTimer = useRef<number>();
+    const fallbackTimer = useRef<number | undefined>(undefined);
     const imageRef = useRef<HTMLImageElement | null>(null);
 
     const setImageRef = (node: HTMLImageElement | null) => {
@@ -60,7 +60,7 @@ export const CoverImage = React.forwardRef<HTMLImageElement, CoverImageProps>(
       );
 
       return () => {
-        if (fallbackTimer.current) {
+        if (fallbackTimer.current !== undefined) {
           window.clearTimeout(fallbackTimer.current);
           fallbackTimer.current = undefined;
         }
@@ -112,7 +112,7 @@ export const CoverImage = React.forwardRef<HTMLImageElement, CoverImageProps>(
             setIsLoaded(true);
             setHasError(false);
 
-            if (fallbackTimer.current) {
+            if (fallbackTimer.current !== undefined) {
               window.clearTimeout(fallbackTimer.current);
               fallbackTimer.current = undefined;
             }
@@ -120,7 +120,7 @@ export const CoverImage = React.forwardRef<HTMLImageElement, CoverImageProps>(
           onError={() => {
             setHasError(true);
 
-            if (fallbackTimer.current) {
+            if (fallbackTimer.current !== undefined) {
               window.clearTimeout(fallbackTimer.current);
               fallbackTimer.current = undefined;
             }
