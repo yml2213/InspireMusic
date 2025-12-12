@@ -204,6 +204,23 @@ export const SearchView: React.FC<SearchViewProps> = ({
           )}
         </>
       )}
+
+      {/* Version & Copyright Info */}
+      <div className="mt-80 mb-8 text-center">
+        <p className="text-xs text-white/40">© InspireMusic v25.12.13.1  All rights reserved.</p>
+        <div className="mt-5 text-white/40 text-xs space-y-1.5 font-medium">
+          <p>
+            Powered by <a
+              href="https://api.tunefree.fun/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary transition-colors underline decoration-white/20 underline-offset-2"
+            >
+              TuneHub API
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
