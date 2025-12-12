@@ -207,7 +207,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
 
       {/* Version & Copyright Info */}
       <div className="mt-80 mb-8 text-center">
-        <p className="text-xs text-white/40">© InspireMusic v25.12.13.1  All rights reserved.</p>
+        <p className="text-xs text-white/40">© InspireMusic v1.2.0  All rights reserved.</p>
         <div className="mt-5 text-white/40 text-xs space-y-1.5 font-medium">
           <p>
             Powered by <a
