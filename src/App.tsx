@@ -11,6 +11,7 @@ import {
 import { useAppStore } from './store/useAppStore';
 import { useAuthStore } from './store/authStore';
 import { AuthModal } from './components/AuthModal';
+import { SyncIndicator } from './components/SyncIndicator';
 import { useMediaSession } from './hooks/useMediaSession';
 import { useTrayTitle } from './hooks/useTrayTitle';
 import type {
@@ -1210,6 +1211,7 @@ function App() {
         <p className="text-gray-300">确定要删除这个歌单吗？此操作无法撤销。</p>
       </Modal>
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <SyncIndicator />
     </Layout>
   );
 }

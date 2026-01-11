@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
+import { useAppStore } from '../store/useAppStore';
 import { X, Mail, Lock, Loader2 } from 'lucide-react';
 
 interface AuthModalProps {
@@ -15,6 +16,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [error, setError] = useState('');
 
     const login = useAuthStore(state => state.login);
+    const loadCloudData = useAppStore(state => state.loadCloudData);
 
     if (!isOpen) return null;
 
@@ -38,7 +40,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             const data = await res.json();
 
             if (isLogin) {
+                // Update auth state
                 login(data.token, data.user);
+
+                // Load cloud data (favorites & playlists)
+                await loadCloudData(data.token);
+
                 onClose();
             } else {
                 // Auto login after register? Or just switch to login?
