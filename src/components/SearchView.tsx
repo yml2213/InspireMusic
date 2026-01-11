@@ -28,6 +28,9 @@ interface SearchViewProps {
   lockedFromPage?: number;
 }
 
+// 搜索历史最大数量
+const MAX_HISTORY_ITEMS = 50;
+
 // Helper to read search history from localStorage
 const getStoredHistory = (): string[] => {
   try {
@@ -83,10 +86,10 @@ export const SearchView: React.FC<SearchViewProps> = ({
     const term = kw || keyword;
     if (!term.trim()) return;
 
-    // Update history
+    // Update history - 限制最多保存 MAX_HISTORY_ITEMS 条记录
     updateHistory((prev) => {
       const newHistory = [term, ...prev.filter((h) => h !== term)];
-      return newHistory.slice(0, 20); // Keep max 20 items
+      return newHistory.slice(0, MAX_HISTORY_ITEMS);
     });
 
     onSearch(term);

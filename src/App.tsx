@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import {
   aggregateSearch,
   buildFileUrl,
@@ -8,6 +8,7 @@ import {
   getToplists,
   searchSongs,
 } from './api';
+import { debounce } from './utils/debounce';
 import { useAppStore } from './store/useAppStore';
 import { useAuthStore } from './store/authStore';
 import { AuthModal } from './components/AuthModal';
@@ -155,29 +156,35 @@ function App() {
     }
   };
 
+  // 优化：为搜索添加防抖功能，避免频繁调用API
+  const debouncedSearch = useMemo(
+    () => debounce(performSearch, 300),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchSource] // 搜索源变化时重新创建防抖函数
+  );
+
   // Player State - 从 Zustand store 获取持久化状态
-  const {
-    currentSong,
-    setCurrentSong,
-    queue,
-    setQueue,
-    queueIndex,
-    setQueueIndex,
-    volume,
-    setVolume,
-    playMode,
-    setPlayMode,
-    quality,
-    setQuality,
-    favorites,
-    playlists,
-    savedProgress,
-    saveProgress: setSavedProgress,
-    addPlaylist,
-    updatePlaylist,
-    deletePlaylist: storeDeletePlaylist,
-    toggleSongInPlaylist: storeToggleSongInPlaylist,
-  } = useAppStore();
+  // 优化：使用选择器避免不必要的重新渲染
+  const currentSong = useAppStore(state => state.currentSong);
+  const setCurrentSong = useAppStore(state => state.setCurrentSong);
+  const queue = useAppStore(state => state.queue);
+  const setQueue = useAppStore(state => state.setQueue);
+  const queueIndex = useAppStore(state => state.queueIndex);
+  const setQueueIndex = useAppStore(state => state.setQueueIndex);
+  const volume = useAppStore(state => state.volume);
+  const setVolume = useAppStore(state => state.setVolume);
+  const playMode = useAppStore(state => state.playMode);
+  const setPlayMode = useAppStore(state => state.setPlayMode);
+  const quality = useAppStore(state => state.quality);
+  const setQuality = useAppStore(state => state.setQuality);
+  const favorites = useAppStore(state => state.favorites);
+  const playlists = useAppStore(state => state.playlists);
+  const savedProgress = useAppStore(state => state.savedProgress);
+  const setSavedProgress = useAppStore(state => state.saveProgress);
+  const addPlaylist = useAppStore(state => state.addPlaylist);
+  const updatePlaylist = useAppStore(state => state.updatePlaylist);
+  const storeDeletePlaylist = useAppStore(state => state.deletePlaylist);
+  const storeToggleSongInPlaylist = useAppStore(state => state.toggleSongInPlaylist);
 
   const [currentInfo, setCurrentInfo] = useState<SongInfo | null>(null);
   const [infoError, setInfoError] = useState<string | null>(null);
@@ -235,15 +242,21 @@ function App() {
   // Use requestAnimationFrame for smoother lyric sync
   const animationFrameRef = useRef<number | null>(null);
   const lastProgressRef = useRef(0);
+  // 优化：将进度存储在ref中，减少setState频率
+  const progressRef = useRef(0);
 
   useEffect(() => {
     const audio = new Audio();
     audioRef.current = audio;
     audio.volume = volume;
 
+    // 优化：降低进度更新频率，从0.05秒提高到0.2秒
     const syncProgress = () => {
       const currentTime = audio.currentTime || 0;
-      if (Math.abs(currentTime - lastProgressRef.current) > 0.05) {
+      progressRef.current = currentTime;
+
+      // 只在进度变化超过0.2秒时更新state（从0.05提高到0.2）
+      if (Math.abs(currentTime - lastProgressRef.current) > 0.2) {
         lastProgressRef.current = currentTime;
         setProgress(currentTime);
       }
@@ -878,7 +891,8 @@ function App() {
               onSearch={async (kw?: string) => {
                 const term = kw ?? keyword;
                 if (kw) setKeyword(kw);
-                await performSearch({ page: 1, term, resetLocked: true });
+                // 使用防抖版本的搜索，避免频繁调用API
+                debouncedSearch({ page: 1, term, resetLocked: true });
               }}
               page={searchPage}
               limit={30}
@@ -889,6 +903,7 @@ function App() {
                 if (!term.trim()) return;
                 if (page === searchPage) return;
                 if (searchLockedFromPage !== undefined && page >= searchLockedFromPage) return;
+                // 翻页使用立即搜索，不需要防抖
                 await performSearch({ page, term });
               }}
               results={searchResults}
