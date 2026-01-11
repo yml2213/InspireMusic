@@ -1,10 +1,10 @@
 # InspireMusic
 
-[在线体验](https://ins-music.netlify.app/) | [下载 Windows 桌面端](https://github.com/WHStudio/InspireMusic/releases/download/v1.3.3/InspireMusic_1.3.3_x64-setup.exe)
+[在线体验](https://inspire-music.pages.dev/) | [下载 Windows 桌面端](https://github.com/yml2213/InspireMusic/releases)
 
-一个现代化的纯前端音乐 APP ，可以在 CloudFlare Pages / Netlify / Vercel 上轻松部署，同时提供 Windows 桌面端。
+一个现代化的纯前端音乐 APP,可以在 Cloudflare Pages / Netlify / Vercel 上轻松部署,同时提供 Windows 桌面端。
 
-后端基于 [TuneHub API](https://api.tunefree.fun/) ，请多多支持后端项目原作者开发的 [TuneFreeNext](https://tunefree.fun/) ，更强大、更好用。
+后端基于 [TuneHub API](https://api.tunefree.fun/),请多多支持后端项目原作者开发的 [TuneFreeNext](https://tunefree.fun/),更强大、更好用。
 
 ## ⚠️ 免责声明
 
@@ -66,44 +66,61 @@
 
 ## ☁️ 部署 (Cloudflare Pages)
 
-本项目已针对 Cloudflare Pages 进行了深度优化，支持边缘计算功能（User Management / History / Admin）。
+本项目已针对 Cloudflare Pages 进行了深度优化,支持边缘计算功能(User Management / History / Admin)。
 
 ### 1. 准备工作
 - Cloudflare 账号
 - Node.js 环境
+- Git 仓库
 
 ### 2. KV 存储配置
-在 Cloudflare Dashboard 中创建两个 KV Namespace：
-- `inspire-users`
-- `inspire-history`
+在 Cloudflare Dashboard 中创建两个 KV Namespace:
+- `inspire-users` - 用于存储用户数据
+- `inspire-history` - 用于存储播放历史
 
-或者使用 Wrangler CLI：
+或者使用 Wrangler CLI 创建:
 ```bash
 npx wrangler kv:namespace create USERS_KV
 npx wrangler kv:namespace create HISTORY_KV
 ```
 
 ### 3. 项目配置
-修改 `wrangler.toml` 文件，填入你的 KV ID：
+修改 `wrangler.toml` 文件,填入你的 KV Namespace ID:
 
 ```toml
 [[kv_namespaces]]
 binding = "USERS_KV"
-id = "<YOUR_USERS_KV_ID>"
+id = "<YOUR_USERS_KV_ID>"  # 替换为你的 USERS_KV ID
 
 [[kv_namespaces]]
 binding = "HISTORY_KV"
-id = "<YOUR_HISTORY_KV_ID>"
+id = "<YOUR_HISTORY_KV_ID>"  # 替换为你的 HISTORY_KV ID
 
 [vars]
-ADMIN_PASSWORD = "your_secure_password" # 用于管理后台 API
+ADMIN_PASSWORD = "your_secure_password"  # 修改为安全的管理员密码
 ```
 
 ### 4. 部署
 ```bash
+# 安装依赖
 pnpm install
-npx wrangler pages deploy .
+
+# 构建项目
+pnpm build
+
+# 部署到 Cloudflare Pages (确保部署 dist 目录而非根目录)
+npx wrangler pages deploy dist
 ```
+
+### 5. 注意事项
+⚠️ **重要**: 部署时必须使用 `dist` 目录,而不是项目根目录 `.`
+- ✅ 正确: `npx wrangler pages deploy dist`
+- ❌ 错误: `npx wrangler pages deploy .`
+
+如果使用 Git 集成部署,确保 Cloudflare Pages 的构建配置为:
+- **构建命令**: `pnpm build`
+- **构建输出目录**: `dist`
+- **根目录**: `/` (项目根目录)
 
 ## 🔐 核心功能增强 (Cloudflare KV)
 
@@ -114,12 +131,48 @@ npx wrangler pages deploy .
 - **🛡️ 管理接口** - 提供 RESTful API 管理用户数据
 
 
-## 🚀 开发环境
+## 🚀 快速开始
 
-- Node.js v24.12.0
-- pnpm 10.25.0
-
+### 本地开发
 ```bash
-# 构建命令，产物位于 /dist
+# 克隆项目
+git clone https://github.com/yml2213/InspireMusic.git
+cd InspireMusic
+
+# 安装依赖
+pnpm install
+
+# 启动开发服务器
+pnpm dev
+
+# 构建生产版本
 pnpm build
 ```
+
+### Tauri 桌面端开发
+```bash
+# 启动 Tauri 开发模式
+pnpm tauri:dev
+
+# 构建桌面应用
+pnpm tauri:build
+```
+
+## 🚀 开发环境要求
+
+- Node.js v24.12.0+
+- pnpm 10.25.0+
+
+## 📄 许可证
+
+本项目采用 [MIT License](LICENSE) 开源许可证。
+
+## 🙏 致谢
+
+- [TuneHub API](https://api.tunefree.fun/) - 提供强大的音乐 API 支持
+- [TuneFreeNext](https://tunefree.fun/) - 更强大的音乐播放器
+- 所有为本项目做出贡献的开发者
+
+## ⚠️ 重要提醒
+
+本项目由 AI Agent 辅助开发,代码质量已经过多轮审查和测试,但仍建议在生产环境使用前进行充分测试。如发现问题,欢迎提交 Issue 或 Pull Request。
