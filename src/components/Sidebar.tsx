@@ -91,7 +91,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <User size={16} />
           </div>
           <div className="flex-1 text-left truncate">
-            {user ? user.email : 'Login / Register'}
+            {user ? user.email : '登录 / 注册'}
           </div>
         </button>
       </div>

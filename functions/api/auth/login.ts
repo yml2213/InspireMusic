@@ -37,12 +37,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         const { email, password } = await request.json() as any;
 
         if (!email || !password) {
-            return new Response('Email and password required', { status: 400 });
+            return new Response('邮箱和密码不能为空', { status: 400 });
         }
 
         const userRaw = await env.USERS_KV.get(`user:email:${email}`);
         if (!userRaw) {
-            return new Response('Invalid credentials', { status: 401 });
+            return new Response('邮箱或密码错误', { status: 401 });
         }
 
         const user = JSON.parse(userRaw) as User;
@@ -55,7 +55,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         const calculatedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
         if (calculatedHash !== user.passwordHash) {
-            return new Response('Invalid credentials', { status: 401 });
+            return new Response('邮箱或密码错误', { status: 401 });
         }
 
         // Generate Token
@@ -77,6 +77,6 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         });
 
     } catch (e) {
-        return new Response('Error logging in', { status: 500 });
+        return new Response('登录失败,请稍后重试', { status: 500 });
     }
 };

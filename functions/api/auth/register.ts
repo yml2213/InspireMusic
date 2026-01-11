@@ -5,13 +5,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         const { email, password } = await request.json() as any;
 
         if (!email || !password) {
-            return new Response('Email and password required', { status: 400 });
+            return new Response('邮箱和密码不能为空', { status: 400 });
         }
 
         // Check if user exists
         const existingUser = await env.USERS_KV.get(`user:email:${email}`);
         if (existingUser) {
-            return new Response('User already exists', { status: 409 });
+            return new Response('该邮箱已被注册', { status: 409 });
         }
 
         const salt = crypto.randomUUID();
@@ -40,6 +40,6 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         });
 
     } catch (e) {
-        return new Response('Error registering user', { status: 500 });
+        return new Response('注册失败,请稍后重试', { status: 500 });
     }
 };

@@ -3,15 +3,15 @@ compatibility_date = "2024-04-01"
 pages_build_output_dir = "dist"
 
 [vars]
-ADMIN_PASSWORD = "Tian@19980919"
+ADMIN_PASSWORD = "Music221329."
 
 
 # Bindings for KV Namespaces
 # You will need to create these namespaces in your Cloudflare dashboard and update the IDs.
 [[kv_namespaces]]
 binding = "USERS_KV"
-id = "5268cfd8a4184b85b0e9af1be20b93c7"
+id = "c22201030db4435a9d1f4568254c1691"
 
 [[kv_namespaces]]
 binding = "HISTORY_KV"
-id = "b7e5b4311285426dab86e0e23b72c329"
+id = "23b30d8934a544a5b82dc57b0c382259"
