@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Heart, User } from 'lucide-react';
 import { clsx } from 'clsx';
 import type { LocalPlaylist } from '../types';
 import { CoverImage } from './ui/CoverImage';
 import { FAVORITES_ID, getPlaylistCover } from '../utils/playlists';
 import { NAV_TABS, type NavTabId } from './navigation/navTabs';
+import { UserMenu } from './UserMenu';
 
 interface SidebarProps {
   activeTab: NavTabId;
@@ -27,6 +28,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenAuth,
   user,
 }) => {
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userButtonRef = useRef<HTMLButtonElement>(null);
+
+  const handleUserAreaClick = () => {
+    if (user) {
+      // If logged in, toggle user menu
+      setIsUserMenuOpen(!isUserMenuOpen);
+    } else {
+      // If not logged in, open auth modal
+      onOpenAuth();
+    }
+  };
+
   return (
     <div className="w-64 bg-black h-full flex flex-col p-4 gap-6 text-gray-400">
       <div className="flex flex-col gap-2">
@@ -84,7 +98,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
       <div className="mt-auto pt-4 border-t border-zinc-800">
         <button
-          onClick={onOpenAuth}
+          ref={userButtonRef}
+          onClick={handleUserAreaClick}
           className="flex items-center gap-3 px-4 py-2 w-full hover:text-white hover:bg-surface/50 rounded-md transition-colors"
         >
           <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
@@ -94,6 +109,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {user ? user.email : '登录 / 注册'}
           </div>
         </button>
+
+        <UserMenu
+          isOpen={isUserMenuOpen}
+          onClose={() => setIsUserMenuOpen(false)}
+          anchorEl={userButtonRef.current}
+        />
       </div>
     </div>
   );
